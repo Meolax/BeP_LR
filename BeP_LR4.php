@@ -24,6 +24,14 @@
         $countNegative = 0;
         $arr = $_REQUEST['values'];
         $i=0;
+        $mass = "[";
+        for ($i; $i < count($arr)-1; $i++)
+        {
+            $mass .= $arr[$i]."; ";
+        }
+        $mass .= $arr[count($arr)-1]."]";
+        echo $mass."<br><br>";
+        $i=0;
         for ($i; $i < count($arr)-1; $i++)
         {
             if ($arr[$i] > $arr[$i+1] && $isProgressive)
@@ -33,9 +41,9 @@
         }
         if ($isProgressive)
         {
-            echo "Progressive ";
+            echo "Возрастающая последовательность ";
         } else {
-            echo "not progressive";
+            echo "Не возрастающая последовательность";
         }
         
 
@@ -47,12 +55,15 @@
                 $sum += $value; 
             }
         }
-        $argNegative = 1; 
+        
         if ($countNegative != 0) {
             $argNegative = $sum / $countNegative;
+            echo "<br>Arg negative: $argNegative";  
+        } else {
+            echo "<br>Нету отрицательных чисел";
         }
         
-        echo "<br>Arg negative: $argNegative";        
+              
     }
     
     function valid ($x)

@@ -19,9 +19,11 @@
         $writeNewData = fwrite($dataFile, $newData);
         if($writeNewData){
             fclose($dataFile);
-            header("Refresh:0");
+            header('Refresh: 0');
         }                
-    } 
+    }
+
+    
 ?>
 <!DOCTYPE html>
 <html>
