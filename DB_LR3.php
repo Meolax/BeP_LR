@@ -1,4 +1,4 @@
-<html>
+html>
     <head>
         <style>
             table, th, td {
@@ -19,6 +19,7 @@
          if (isset($_REQUEST['Word']))
          {
             $word = $_REQUEST['Word'];
+            
             $dbServerName="localhost";
             $dbUserName="root";
             $dbPassword="data#base56";
@@ -28,45 +29,54 @@
             mysqli_query($conn, "SET NAMES utf8;");
 
             $sql = "SHOW TABLES";
-            $result = mysqli_query($conn, $sql);
+            $tablesName = mysqli_query($conn, $sql);
 
-            while ($row = mysqli_fetch_assoc($result)){
+            while ($tableName = mysqli_fetch_assoc($tablesName)){
                 
-                if (findStringInTable ($row[$wayForTable], $wayForTable, $word) -> num_rows > 0) {
+                if (findRowsInTableWithWord ($tableName[$wayForTable], $wayForTable, $word) -> num_rows > 0) {
                     echo "<table>";
-                    $columsName = GetColumsNameFromTable ($row[$wayForTable], $wayForTable);
-                    echo "<tr><th colspan='".(mysqli_field_count($conn)+1)."'>".$row[$wayForTable]."</th></tr>";
-                    echo "<tr>";
-                    while ($row2 = mysqli_fetch_assoc($columsName)){                  
-                        echo "<th>".$row2['Field']."</th>";                   
-                    }
-                    echo "</tr>";
 
+                    $columsName = GetColumsNameFromTable ($tableName[$wayForTable], $wayForTable);
+                    echo "<tr><th colspan='".(mysqli_field_count($conn)+1)."'>".$tableName[$wayForTable]."</th></tr>";
+                    
+                    fillColumsHeader ($columsName);
                 
-                    $rowOfTable = findStringInTable ($row[$wayForTable], $wayForTable, $word);
-
-                    while ($row2 = mysqli_fetch_assoc($rowOfTable)){
-                        echo "<tr>";
-                        $i =0;
-                        foreach($row2 as $inneritem)
-                        {
-                            echo "<td>".$inneritem."</td>";
-                            $i++;
-                        }
-                        echo "</tr>";
-                    } 
+                    $rowsOfTable = findRowsInTableWithWord ($tableName[$wayForTable], $wayForTable, $word);
+                    fillRows ($rowsOfTable);
+                    
                     echo "</stable>";
                 }                
             }         
          }
         
+        function fillColumsHeader ($columsName)
+        {
+            echo "<tr>";
+            while ($columName = mysqli_fetch_assoc($columsName)){                  
+                echo "<th>".$columName['Field']."</th>";                   
+            }
+            echo "</tr>";
+        }
+        
+        function fillRows ($rowsOfTable)
+        {
+            while ($row2 = mysqli_fetch_assoc($rowsOfTable)){
+                echo "<tr>";
+                foreach($row2 as $inneritem)
+                {
+                    echo "<td>".$inneritem."</td>";
+                }
+                echo "</tr>";
+            } 
+        }
+
         function GetColumsNameFromTable ($tableName, $wayForTable)
         {
             $sql = "DESCRIBE ".$tableName;
             return mysqli_query($GLOBALS['conn'], $sql);
         }
 
-        function findStringInTable ( $tableName, $wayForTable, $str)
+        function findRowsInTableWithWord ( $tableName, $wayForTable, $str)
         {
             $query = "Select * from ".$tableName." where concat ( ";
             
