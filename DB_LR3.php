@@ -24,7 +24,7 @@
             $dbPassword="data#base56";
             $dbName="medcart";
             $wayForTable = 'Tables_in_'.$dbName;
-            $conn = mysqli_connect($dbServerName,$dbUserName,$dbPassword,$dbName);
+            $conn = mysqli_connect( $dbServerName, $dbUserName, $dbPassword, $dbName);
             mysqli_query($conn, "SET NAMES utf8;");
 
             $sql = "SHOW TABLES";
@@ -59,44 +59,25 @@
                 }                
             }         
          }
-            
-                
-            
+        
+        function GetColumsNameFromTable ($tableName, $wayForTable)
+        {
+            $sql = "DESCRIBE ".$tableName;
+            return mysqli_query($GLOBALS['conn'], $sql);
+        }
 
-            function GetColumsNameFromTable ($tableName, $wayForTable)
-            {
-                $sql = "DESCRIBE ".$tableName;
-                return mysqli_query($GLOBALS['conn'], $sql);
-            }
-
-            function getRefIfThisIsFK($table,$column){
-                $sql = "select referenced_table_name as 'references' from
-                information_schema.key_column_usage where
-                referenced_table_name is not null and table_name='".$table."' and column_name='".$column."';"; 
-                $result = mysqli_query($GLOBALS['conn'], $sql);
-                $row = mysqli_fetch_assoc($result);
-                return $row['references'];
-            }
+        function findStringInTable ( $tableName, $wayForTable, $str)
+        {
+            $query = "Select * from ".$tableName." where concat ( ";
             
-            function GetValueOfFK($table,$id, $column){
-                $sql = "Select * From ".$table." Where ".$column."=$id limit 1";
-                $result = mysqli_query($GLOBALS['conn'], $sql);
-                $row = mysqli_fetch_row($result);
-                return  $row[1];
+            $columsName = GetColumsNameFromTable ( $tableName, $wayForTable);
+            while ($columName = mysqli_fetch_assoc($columsName)){                  
+                $query .= $tableName.".".$columName['Field'].", \" \",";                   
             }
-
-            function findStringInTable ( $tableName, $wayForTable, $str)
-            {
-                $query = "Select * from ".$tableName." where concat ( ";
-                
-                $columsName = GetColumsNameFromTable ( $tableName, $wayForTable);
-                while ($columName = mysqli_fetch_assoc($columsName)){                  
-                   $query .= $columName['Field'].", \" \",";                   
-                }
-                $query = substr($query, 0, -1);
-                $query .= ") like \"%".$str."%\";";
-                return mysqli_query($GLOBALS['conn'], $query);
-            }
+            $query = substr($query, 0, -1);
+            $query .= ") like \"%".$str."%\";";
+            return mysqli_query($GLOBALS['conn'], $query);
+        }
         ?>
     </body>
 </html> 
